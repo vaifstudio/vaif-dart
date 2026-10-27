@@ -454,8 +454,8 @@ invokes the function once more.
 ## Generated API operations
 
 `vaif.operations` has one method for each operation in the VAIF Studio API
-contract that has a typed success response, except the operations VAIF's own
-staff tools use: 801 in this version. The methods are generated from the API's
+contract that has a typed success response, except the staff-only operations:
+775 in this version. The methods are generated from the API's
 OpenAPI contract and are named after the HTTP method and path:
 
 ```dart
@@ -475,10 +475,14 @@ expose that redirect to the page, so on the web the call fails with
 `VaifNetworkException`; use `storage.download()`, which works on every
 platform.
 
-The `operations` table lists what is generated. `ungeneratedOperations` lists
-the other 142 operations with the reason: those without a typed success
-response, and the 108 operations VAIF's own staff tools use (`/admin/*` and
-`/auth/impersonate/*`), listed as `platform staff only`.
+The `operations` table lists what is generated (775 methods).
+`ungeneratedOperations` lists the other 168 operations with the reason: those
+without a typed success response, and the 134 staff-only operations, listed
+as `platform staff only`. The API answers the staff-only operations only for
+VAIF platform staff: every operation under `/admin/*` and
+`/auth/impersonate/*`, and those outside them: feature flags (`/flags`),
+enterprise contract and invoice writes, Verament usage statistics
+(`GET /ai/copilot/stats`) and documentation edits under `/docs`.
 
 ## Error handling
 

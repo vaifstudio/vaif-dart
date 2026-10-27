@@ -112,12 +112,16 @@ Requires Dart 3.7 or later (Flutter 3.29 or later). Runtime dependencies:
 ### Generated operations
 
 - `vaif.operations`: one method for each API operation with a typed success
-  response, except the operations VAIF's own staff tools use (801 methods),
-  generated from the API's OpenAPI contract. The 142 other
-  operations, including the 108 that VAIF's own staff tools use (`/admin/*`
-  and `/auth/impersonate/*`, listed as `platform staff only`), are in
+  response, except the staff-only operations (775 methods), generated from
+  the API's OpenAPI contract. The 168 other operations, including the 134
+  staff-only ones (listed as `platform staff only`), are in
   `ungeneratedOperations` with the reason. Path values are
   URL-encoded, required parameters and bodies are checked before sending,
   `getStorageDownload()` follows the API's redirect to the signed link (not
   on the web) and returns bytes, and the streaming chat route returns the live
   response, whose body stream reports failures as `VaifNetworkException`.
+- Staff-only operations are not generated, including the ones outside
+  `/admin`: every operation under `/admin/*` and `/auth/impersonate/*`, plus
+  feature flags (`/flags`), enterprise contract and invoice writes,
+  `GET /ai/copilot/stats` and documentation edits under `/docs`. The API
+  answers them only for VAIF platform staff.

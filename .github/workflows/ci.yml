@@ -1,0 +1,105 @@
+name: CI
+
+# Builds and tests vaif_client. It never publishes.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  schedule:
+    # Weekly, so an advisory or a dependency release published after the
+    # last change still fails a run.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: analyze, format, test, web build (stable)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+        with:
+          sdk: stable
+      - name: Resolve dependencies
+        run: dart pub get
+      - name: Format
+        # lib/src/generated/operations.dart is written by the generator in
+        # dart format's layout inside a `// dart format off` region, so the
+        # formatter must leave it unchanged too.
+        run: dart format --output=none --set-exit-if-changed lib test example
+      - name: Analyze
+        run: dart analyze --fatal-infos
+      - name: Test
+        # Unit tests mock HTTP; the realtime tests use a loopback WebSocket.
+        # Integration tests skip themselves without VAIF_IT_* variables.
+        run: dart test --reporter expanded
+      - name: Compile the example for the web (JavaScript and Wasm)
+        # Proves the package has no dart:io or Flutter dependency.
+        run: |
+          dart compile js -O2 -o "$RUNNER_TEMP/web/example.js" example/main.dart
+          dart compile wasm -o "$RUNNER_TEMP/web/example.wasm" example/main.dart
+
+  floor:
+    name: library on the Dart 3.7 floor with lowest dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+        with:
+          sdk: 3.7.0
+      - name: Resolve the lowest allowed dependencies and analyze lib
+        # Dev tools (lints, test) need newer SDKs than the package itself, so
+        # the floor is checked on the library alone, as a consumer resolves it.
+        run: |
+          floor="$RUNNER_TEMP/floor"
+          mkdir -p "$floor"
+          cp -R lib pubspec.yaml analysis_options.yaml "$floor/"
+          cd "$floor"
+          sed -i '/^dev_dependencies:/,$d' pubspec.yaml
+          sed -i '/^include:/d' analysis_options.yaml
+          dart pub downgrade
+          dart analyze lib
+
+  vulnerabilities:
+    name: known vulnerabilities (OSV-Scanner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+        with:
+          sdk: stable
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.3"
+          cache: false
+      # OSV-Scanner exits non-zero on any known vulnerability in the lockfile
+      # (runtime and dev dependencies, direct and transitive). pubspec.lock is
+      # gitignored and the scanner skips ignored files, so it is named
+      # explicitly. Both ends of the allowed ranges are scanned: the newest
+      # versions, which a new resolution picks, and the lowest, which the
+      # pubspec's minimums allow.
+      - name: Scan the newest allowed versions
+        run: |
+          dart pub upgrade
+          go run github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.7.0 scan source --lockfile=pubspec.lock
+      - name: Scan the lowest allowed versions
+        run: |
+          dart pub downgrade
+          go run github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.7.0 scan source --lockfile=pubspec.lock

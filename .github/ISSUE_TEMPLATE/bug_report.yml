@@ -1,0 +1,38 @@
+name: Bug report
+description: Report something in vaif_client that does not work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report security vulnerabilities here. Email security@vaif.studio as described in SECURITY.md.
+        Remove API keys, tokens and personal data from everything you paste.
+  - type: input
+    id: version
+    attributes:
+      label: vaif_client version or commit
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Dart or Flutter version and platform
+      description: The output of `dart --version` or `flutter --version`, and the platform (Android, iOS, macOS, Windows, Linux, web or server).
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, what happened instead, and the full error, including its `code` and `requestId` if it is a VaifException.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: A minimal program or the steps that reproduce the problem.
+      render: dart
+    validations:
+      required: true

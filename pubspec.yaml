@@ -1,0 +1,30 @@
+name: vaif_client
+description: >-
+  Official Dart and Flutter SDK for VAIF Studio: app-user auth, database
+  queries, realtime changes, storage, functions and generated methods for the
+  API's operations.
+version: 1.0.0
+homepage: https://github.com/vaifstudio/vaif-dart
+repository: https://github.com/vaifstudio/vaif-dart
+issue_tracker: https://github.com/vaifstudio/vaif-dart/issues
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  crypto: ^3.0.8
+  http: ^1.6.0
+  http_parser: ^4.1.2
+  web_socket_channel: ^3.0.3
+
+dev_dependencies:
+  lints: ^6.1.0
+  stream_channel: ^2.1.4
+  test: ^1.33.0
+
+topics:
+  - backend
+  - database
+  - authentication
+  - storage
+  - api

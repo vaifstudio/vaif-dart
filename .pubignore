@@ -1,0 +1,6 @@
+# .pubignore replaces .gitignore for `dart pub publish`, so it repeats it.
+.dart_tool/
+build/
+coverage/
+doc/api/
+pubspec.lock

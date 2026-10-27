@@ -1,0 +1,6 @@
+.dart_tool/
+build/
+coverage/
+doc/api/
+# A library does not commit its lockfile.
+pubspec.lock

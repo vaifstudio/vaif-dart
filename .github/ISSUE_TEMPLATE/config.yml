@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/vaifstudio/vaif-dart/security/policy
+    about: Report vulnerabilities privately by email to security@vaif.studio, as described in SECURITY.md. Do not open a public issue.
+  - name: Help with your VAIF Studio account or project
+    url: https://vaif.studio/contact/
+    about: Questions about your account, billing or project, rather than about this SDK.

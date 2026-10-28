@@ -70,7 +70,7 @@ String normalizeBaseUrl(String baseUrl) {
     throw ArgumentError.value(
       baseUrl,
       'baseUrl',
-      'must use https (http is only allowed for localhost)',
+      'must use https (http is accepted only for localhost, 127.0.0.1 and ::1)',
     );
   }
   if (uri.userInfo.isNotEmpty || uri.hasQuery || uri.hasFragment) {

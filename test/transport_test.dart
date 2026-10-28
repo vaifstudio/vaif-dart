@@ -22,6 +22,39 @@ void main() {
       );
     });
 
+    // Plain http would send the project key and bearer token in cleartext.
+    test('requires https except for localhost, 127.0.0.1 and ::1', () {
+      const allowed = {
+        'https://api.example.com/': 'https://api.example.com',
+        'HTTPS://api.example.com': 'HTTPS://api.example.com',
+        'http://localhost:3000': 'http://localhost:3000',
+        'http://127.0.0.1:3000': 'http://127.0.0.1:3000',
+        'http://[::1]:3000': 'http://[::1]:3000',
+      };
+      allowed.forEach((base, normalized) {
+        final c = VaifClient(projectId: project, apiKey: key, baseUrl: base);
+        expect(c.baseUrl, normalized);
+      });
+      for (final base in [
+        'http://api.example.com',
+        'HTTP://api.example.com',
+        'http://localhost.example.com',
+      ]) {
+        expect(
+          () => VaifClient(projectId: project, apiKey: key, baseUrl: base),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              'must use https (http is accepted only for localhost, '
+                  '127.0.0.1 and ::1)',
+            ),
+          ),
+          reason: base,
+        );
+      }
+    });
+
     test('allows http for localhost and strips trailing slashes', () {
       final c = VaifClient(
         projectId: project,

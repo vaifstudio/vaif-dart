@@ -1,7 +1,7 @@
 # VAIF Studio SDK for Dart and Flutter
 
 <!-- BEGIN GENERATED SDK STATUS: notice:dart -->
-> `vaif_client` 1.0.0 is the version in this repository. The hosted API (`https://api.vaif.studio`) and console are not available yet.
+> `vaif_client` 1.0.0 is the version in this repository, has not been tagged yet and is not on pub.dev yet. The hosted API (`https://api.vaif.studio`) and console are not available yet.
 <!-- END GENERATED SDK STATUS: notice:dart -->
 
 `vaif_client` is the official Dart and Flutter client library for the
